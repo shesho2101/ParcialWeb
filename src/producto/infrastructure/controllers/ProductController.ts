@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { CreateProduct } from '../../aplication/usecases/CreateProduct';
-import { ListProducts } from '../../aplication/usecases/ListProducts';
+import { CreateProduct } from '../../application/usecases/CreateProduct';
+import { ListProducts } from '../../application/usecases/ListProducts';
 
 export default class ProductController {
   constructor(
