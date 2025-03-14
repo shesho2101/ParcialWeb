@@ -1,6 +1,7 @@
 import { IUserRepository } from "../../domain/interfaces/IUserRepository";
 import { IAuthService } from "../../domain/interfaces/IAuthService";
-import { User } from "../../domain/entities/User";
+import User from "../../domain/entities/User";
+import { UserInterface } from "../../domain/interfaces/UserInterface";
 
 export default class AuthenticateUser {
   constructor(
@@ -9,14 +10,19 @@ export default class AuthenticateUser {
   ) {}
 
   async execute(email: string, password: string): Promise<string> {
-    const userData = await this.userRepository.getByEmail(email);
-    if (!userData) throw new Error('Usuario no encontrado');
+    const user = await this.userRepository.getByEmail(email);
+    if (!user) throw new Error('Usuario no encontrado');
 
-    const user = new User(userData);
+    console.log("🔍 Contraseña ingresada:", password);
+    console.log("🔐 Contraseña almacenada (hash):", user.password);
 
-    const passwordMatch = await this.authService.comparePasswords(password, user.getPassword());
+    if (!user.password) {
+        throw new Error('⚠ No hay contraseña almacenada para este usuario.');
+    }
+
+    const passwordMatch = await this.authService.comparePasswords(password, user.password);
     if (!passwordMatch) throw new Error('Contraseña incorrecta');
 
-    return this.authService.generateToken(userData); // ← ahora pasas directamente userData
+    return this.authService.generateToken(user);
   }
 }

@@ -4,26 +4,32 @@ import AuthenticateUser from "../../application/usecases/AuthenticateUser";
 
 export default class UserController {
   constructor(
-    private readonly registerUser: RegisterUser,
-    private readonly authenticateUser: AuthenticateUser
+    private registerUserUseCase: RegisterUser,
+    private authenticateUserUseCase: AuthenticateUser
   ) {}
 
-  public register = async (req: Request, res: Response) => {
+  async register(req: Request, res: Response) {
     try {
-      const user = await this.registerUser.execute(req.body);
+      const user = await this.registerUserUseCase.execute(req.body);
       res.status(201).json(user);
-    } catch (error: any) {
-      res.status(400).json({ error: error.message });
+    } catch (error) {
+      // ⚠️ Hacemos un cast de 'error' a 'Error' antes de acceder a 'message'
+      const err = error as Error;
+      res.status(400).json({ message: err.message });
     }
-  };
+  }
 
-  public authenticate = async (req: Request, res: Response) => {
+  async authenticate(req: Request, res: Response) {
     try {
-      const { email, password } = req.body;
-      const token = await this.authenticateUser.execute(email, password);
-      res.status(200).json({ token });
-    } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      const token = await this.authenticateUserUseCase.execute(
+        req.body.email,
+        req.body.password
+      );
+      res.json({ token });
+    } catch (error) {
+      // ⚠️ Hacemos un cast de 'error' a 'Error' antes de acceder a 'message'
+      const err = error as Error;
+      res.status(401).json({ message: err.message });
     }
-  };
+  }
 }

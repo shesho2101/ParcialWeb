@@ -1,5 +1,5 @@
 import { ProductInterface } from "../../domain/interfaces/ProductInterface";
-import { Product } from "../../domain/entities/Product";
+import Product from "../../domain/entities/Product";
 import { IProductRepository } from "../../domain/interfaces/IProductRepository";
 
 export class CreateProduct {

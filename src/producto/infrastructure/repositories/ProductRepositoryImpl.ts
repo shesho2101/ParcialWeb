@@ -1,33 +1,48 @@
+import { Op } from "sequelize";
+import Product from "../../domain/entities/Product";
 import { IProductRepository } from "../../domain/interfaces/IProductRepository";
-import { Product } from "../../domain/entities/Product";
-import { NullProduct } from "../../domain/entities/NullProduct";
 
-export class ProductRepositoryImpl implements IProductRepository {
-  private products: Product[] = [];
-
-  async getById(id: string): Promise<Product> {
-    const product = this.products.find(p => p.getId() === id);
-    return product || new NullProduct();
+export default class ProductRepositoryImpl implements IProductRepository {
+  async getById(id: number): Promise<Product | null> {
+    return await Product.findByPk(id);
   }
 
   async getAll(): Promise<Product[]> {
-    return this.products;
+    return await Product.findAll();
   }
 
-  async create(product: Product): Promise<Product> {
-    this.products.push(product);
+  async create(): Promise<Product> {
+    return await Product.create(); // El 'id' será generado automáticamente por Sequelize
+  }
+
+  async update(id: number, productData: Partial<Product>): Promise<Product | null> {
+    const product = await Product.findByPk(id);
+    if (!product) return null;
+    await product.update(productData);
     return product;
   }
 
-  async update(updatedProduct: Product): Promise<Product> {
-    const index = this.products.findIndex(p => p.getId() === updatedProduct.getId());
-    if (index !== -1) {
-      this.products[index] = updatedProduct;
-    }
-    return updatedProduct;
+  async delete(id: number): Promise<void> {
+    await Product.destroy({ where: { id } });
   }
 
-  async delete(id: string): Promise<void> {
-    this.products = this.products.filter(p => p.getId() !== id);
+  async getByCategory(category: string): Promise<Product[]> {
+    return await Product.findAll({ where: { category } });
+  }
+
+  async getByPriceRange(min: number, max: number): Promise<Product[]> {
+    return await Product.findAll({ where: { price: { [Op.between]: [min, max] } } });
+  }
+
+  async getDiscounted(): Promise<Product[]> {
+    return await Product.findAll({ where: { discount: { [Op.gt]: 0 } } });
+  }
+
+  async searchByName(name: string): Promise<Product[]> {
+    return await Product.findAll({ where: { name: { [Op.like]: `%${name}%` } } });
+  }
+
+  async getPaginated(page: number, limit: number): Promise<Product[]> {
+    return await Product.findAll({ offset: (page - 1) * limit, limit });
   }
 }

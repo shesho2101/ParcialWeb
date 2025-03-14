@@ -13,7 +13,7 @@ export default class UserRouterFactory {
 
     const registerUserUseCase = new RegisterUser(repository, authService);
     const authenticateUserUseCase = new AuthenticateUser(repository, authService);
-
+    
     const controller = new UserController(registerUserUseCase, authenticateUserUseCase);
 
     return new UserRouterExpress(controller);

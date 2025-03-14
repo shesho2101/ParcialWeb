@@ -1,20 +1,17 @@
 import { IUserRepository } from "../../domain/interfaces/IUserRepository";
-import { UserInterface } from "../../domain/interfaces/UserInterface";
+import User from "../../domain/entities/User";
 
 export default class UserRepositoryImpl implements IUserRepository {
-  private users: UserInterface[] = [];
-
-  async getByEmail(email: string): Promise<UserInterface | null> {
-    const user = this.users.find(u => u.email === email);
-    return user || null;
+  async getByEmail(email: string): Promise<User | null> {
+    return await User.findOne({ where: { email } });
   }
 
-  async create(user: UserInterface): Promise<UserInterface> {
-    this.users.push(user);
-    return user;
+  async create(userData: Partial<User>): Promise<User> {
+    return await User.create(userData);
   }
 
   async exists(email: string): Promise<boolean> {
-    return this.users.some(u => u.email === email);
+    const user = await User.findOne({ where: { email } });
+    return !!user;
   }
 }

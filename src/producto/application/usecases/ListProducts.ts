@@ -1,7 +1,7 @@
-import { Product } from "../../domain/entities/Product";
 import { IProductRepository } from "../../domain/interfaces/IProductRepository";
+import Product from "../../domain/entities/Product";
 
-export class ListProducts {
+export default class ListProducts {
   constructor(private productRepository: IProductRepository) {}
 
   async execute(): Promise<Product[]> {

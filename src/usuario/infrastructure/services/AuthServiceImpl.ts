@@ -18,6 +18,9 @@ export default class AuthServiceImpl implements IAuthService {
   }
 
   async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, this.saltRounds);
+    console.log("🛠️ Hasheando contraseña...");
+    const hash = await bcrypt.hash(password, this.saltRounds);
+    console.log("✅ Hash generado:", hash);
+    return hash;
   }
-}
+}  
